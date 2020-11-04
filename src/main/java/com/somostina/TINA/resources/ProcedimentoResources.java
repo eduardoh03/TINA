@@ -1,6 +1,7 @@
 package com.somostina.TINA.resources;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,50 +19,54 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.somostina.TINA.dto.CategoryDTO;
-import com.somostina.TINA.service.CategoryService;
+import com.somostina.TINA.dto.ProcedimentoDTO;
+import com.somostina.TINA.service.ProcedimentoService;
 
 @RestController
-@RequestMapping(value= "/categoria")
-public class CategoryResources {
+@RequestMapping(value= "/procedimentos")
+public class ProcedimentoResources {
 	
 	@Autowired
-	private CategoryService service;
+	private ProcedimentoService service;
 	
-	
+	@GetMapping
+	public ResponseEntity<List<ProcedimentoDTO>> findAll(){
+		List<ProcedimentoDTO> list = service.findAll();
+	return ResponseEntity.ok().body(list);
+	}
 	@GetMapping(value= "/paged")
-	public ResponseEntity<Page<CategoryDTO>> findAll(
+	public ResponseEntity<Page<ProcedimentoDTO>> findAll(
 		@RequestParam(value = "page", defaultValue = "0") Integer page,
 		@RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
 		@RequestParam(value = "direction", defaultValue = "ASC") String direction,
 		@RequestParam(value = "orderBy", defaultValue = "name") String orderBy) {
 		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
 
-		Page<CategoryDTO> list = service.findAllPaged(pageRequest);
+		Page<ProcedimentoDTO> list = service.findAllPaged(pageRequest);
 		return ResponseEntity.ok().body(list);
 	}
 
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
-		CategoryDTO list = service.findById(id);
+	public ResponseEntity<ProcedimentoDTO> findById(@PathVariable Long id) {
+		ProcedimentoDTO list = service.findById(id);
 		return ResponseEntity.ok().body(list);
 	}
 
 	@PostMapping
-	public ResponseEntity<CategoryDTO> insert(@RequestBody CategoryDTO dto) {
+	public ResponseEntity<ProcedimentoDTO> insert(@RequestBody ProcedimentoDTO dto) {
 		dto = service.insert(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(dto);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @RequestBody CategoryDTO dto) {
+	public ResponseEntity<ProcedimentoDTO> update(@PathVariable Long id, @RequestBody ProcedimentoDTO dto) {
 		dto = service.update(id, dto);
 		return ResponseEntity.ok().body(dto);
 	}
 
 	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<CategoryDTO> delete(@PathVariable Long id) {
+	public ResponseEntity<ProcedimentoDTO> delete(@PathVariable Long id) {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
